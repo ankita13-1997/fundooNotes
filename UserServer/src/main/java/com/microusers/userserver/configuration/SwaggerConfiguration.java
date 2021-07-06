@@ -24,8 +24,8 @@ public class SwaggerConfiguration {
 
         Contact contact = new Contact("CFP-051", "https://bridgelabz.com/", "yennefer9713@gmail.com");
 
-        return new ApiInfoBuilder().title("Online BookStore backend API ")
-                .description("Online Book Store Api for managing the book store")
+        return new ApiInfoBuilder().title("FUNDOO NOTES backend API ")
+                .description("FUNDOO NOTES API ")
                 .version("1.0")
                 .license("Apache 2.0").licenseUrl("http://www.apache.org/licenses/LICENSE-2.0").contact(contact)
                 .build();
