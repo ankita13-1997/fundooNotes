@@ -10,7 +10,8 @@ public class NoteException extends RuntimeException{
 
     public enum ExceptionType {
         NOTE_ALREADY_PRESENT("NOTE IS ALREADY THERE"),
-        USER_NOT_PRESENT("USER NOT SPECIIED !!!!");
+        USER_NOT_PRESENT("USER NOT SPECIIED !!!!"),
+        NOTE_NOT_PRESENT("NOTE NOT AVAILABLE");
 
         public String errorMsg;
 

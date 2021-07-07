@@ -11,6 +11,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/notes_api")
@@ -38,7 +39,7 @@ public class NoteController {
     }
 
     @GetMapping("/get_all_notes")
-    public ResponseEntity addNotes(@RequestHeader(value = "UserToken")String Token){
+    public ResponseEntity getNotesList(@RequestHeader(value = "UserToken")String Token){
         List<NoteDetailsModel> noteDetailsModelList = noteService.getListNotes(Token);
 
         return  new ResponseEntity
@@ -46,7 +47,46 @@ public class NoteController {
                         HttpStatus.OK);
     }
 
+    @GetMapping("/get_notes_byId")
+    public ResponseEntity getNotesById(@RequestHeader(value = "UserToken")String Token,
+                                       @RequestParam(name = "noteId") UUID noteId){
+        NoteDetailsModel noteDetailsModel=noteService.getNoteById(Token,noteId);
+
+        return  new ResponseEntity
+                (new ResponseDto("THE NOTE BY YOUR SELECTION IS ","200", noteDetailsModel),
+                        HttpStatus.OK);
+
+    }
 
 
+    @GetMapping("/get_notes_byDate")
+    public ResponseEntity getNotesByTime(@RequestHeader(value = "UserToken")String Token){
+        List<NoteDetailsModel> noteDetailsModelList=noteService.getNotesByDate(Token);
+        return  new ResponseEntity
+                (new ResponseDto("THE NOTE BY YOUR TIME IS ","200", noteDetailsModelList),
+                        HttpStatus.OK);
+
+    }
+
+    @GetMapping("/get_notes_byTitle")
+    public ResponseEntity getNotesByTitle(@RequestHeader(value = "UserToken")String Token){
+        List<NoteDetailsModel> noteDetailsModelList=noteService.getNotesByTitle(Token);
+        return  new ResponseEntity
+                (new ResponseDto("THE NOTE BY YOUR TITLE IS ","200", noteDetailsModelList),
+                        HttpStatus.OK);
+
+    }
+
+    @GetMapping("/get_notes_byFilter")
+    public ResponseEntity getNotesByFilter(@RequestHeader(value = "UserToken")String Token,
+                                           @RequestParam(name = "pin") boolean pin,
+                                           @RequestParam(name = "archive") boolean archive,
+                                           @RequestParam(name = "trash") boolean trash){
+        List<NoteDetailsModel> noteDetailsModelList=noteService.getNotesByFilter(Token,pin,archive,trash);
+        return  new ResponseEntity
+                (new ResponseDto("THE NOTE BY YOUR FILTER IS ","200", noteDetailsModelList),
+                        HttpStatus.OK);
+
+    }
 
 }

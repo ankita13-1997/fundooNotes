@@ -11,8 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class NoteService implements INoteService {
@@ -48,9 +51,62 @@ public class NoteService implements INoteService {
     @Override
     public List<NoteDetailsModel> getListNotes(String token) {
         UserDetailsModel userDetailsModel =findUser(token);
-        List<NoteDetailsModel> noteDetailsList = noteRepository.findAll();
-
+        UUID userNumber = userDetailsModel.getUserId();
+        System.out.println(userNumber);
+//        List<NoteDetailsModel> noteDetailsList = noteRepository.findAll().stream().
+//                    filter(note -> note.getUserId()==userNumber).
+//                     collect(Collectors.toList());
+        List<NoteDetailsModel> noteDetailsList = noteRepository.findByUserId(userNumber);
+        System.out.println(noteDetailsList);
         return noteDetailsList;
+    }
+
+    @Override
+    public NoteDetailsModel getNoteById(String token, UUID noteId) {
+        UserDetailsModel userDetailsModel = findUser(token);
+        Optional<NoteDetailsModel> noteDetailsModel = noteRepository.findById(noteId);
+        if (!noteDetailsModel.isPresent()){
+            throw new NoteException(NoteException.ExceptionType.NOTE_ALREADY_PRESENT);
+
+        }
+        return noteDetailsModel.get();
+    }
+
+    @Override
+    public List<NoteDetailsModel> getNotesByDate(String token) {
+        UserDetailsModel userDetails = findUser(token);
+        UUID userNumber = userDetails.getUserId();
+        List<NoteDetailsModel> noteDetailsList = noteRepository.findByUserId(userNumber);
+        List<NoteDetailsModel> notelist=noteDetailsList.stream().
+                sorted(Comparator.comparing(NoteDetailsModel::getCreatedDate).reversed()).parallel().
+                collect(Collectors.toList());
+
+
+        return notelist;
+    }
+
+    @Override
+    public List<NoteDetailsModel> getNotesByTitle(String token) {
+        UserDetailsModel userDetails = findUser(token);
+        UUID userNumber = userDetails.getUserId();
+        List<NoteDetailsModel> noteDetailsList = noteRepository.findByUserId(userNumber);
+        List<NoteDetailsModel> notelist=noteDetailsList.stream().
+                sorted(Comparator.comparing(NoteDetailsModel::getTitle).reversed()).parallel().
+                collect(Collectors.toList());
+        return notelist;
+    }
+
+    @Override
+    public List<NoteDetailsModel> getNotesByFilter(String token,boolean pin,boolean archive,boolean trash) {
+        UserDetailsModel userDetails = findUser(token);
+        UUID userNumber = userDetails.getUserId();
+        List<NoteDetailsModel> noteDetailsList = noteRepository.findByUserId(userNumber);
+        List<NoteDetailsModel> notelist=noteDetailsList.stream().
+                filter(noteDetails -> noteDetails.isArchive()==archive &&
+                        noteDetails.isPin()==pin && noteDetails.isTrash()==trash).
+                        sorted(Comparator.comparing(NoteDetailsModel::getTitle).reversed()).parallel().
+                        collect(Collectors.toList());
+        return notelist;
     }
 
 
