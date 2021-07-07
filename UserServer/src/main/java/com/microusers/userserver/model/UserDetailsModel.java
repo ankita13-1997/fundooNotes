@@ -39,6 +39,7 @@ public class UserDetailsModel {
     public LocalDateTime updatedAt;
 
 
+
     public UserDetailsModel(String fullName, String phoneNumber, String emailID, String password) {
         this.fullName = fullName;
         this.phoneNumber = phoneNumber;
@@ -55,6 +56,7 @@ public class UserDetailsModel {
         this.isVerified=userDetailsModel.isVerified();
         this.createdAt=userDetailsModel.getCreatedAt();
         this.updatedAt=userDetailsModel.getUpdatedAt();
+
     }
 
 
