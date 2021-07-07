@@ -1,4 +1,4 @@
-package com.microusers.userserver.configuration;
+package com.microusers.noteservices.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +17,7 @@ public class SwaggerConfiguration {
     @Bean
     public Docket apiDocket() {
         return new Docket(DocumentationType.SWAGGER_2).apiInfo(getApiInfo()).select()
-                .apis(RequestHandlerSelectors.basePackage("com.microusers.userserver")).paths(PathSelectors.any()).build();
+                .apis(RequestHandlerSelectors.basePackage("com.microusers.noteservices")).paths(PathSelectors.any()).build();
     }
 
     private ApiInfo getApiInfo() {
@@ -25,7 +25,7 @@ public class SwaggerConfiguration {
         Contact contact = new Contact("CFP-051", "https://bridgelabz.com/", "yennefer9713@gmail.com");
 
         return new ApiInfoBuilder().title("FUNDOO NOTES backend API ")
-                .description("FUNDOO USER API ")
+                .description("FUNDOO NOTES API ")
                 .version("1.0")
                 .license("Apache 2.0").licenseUrl("http://www.apache.org/licenses/LICENSE-2.0").contact(contact)
                 .build();
