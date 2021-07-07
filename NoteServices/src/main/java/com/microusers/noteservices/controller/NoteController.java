@@ -78,6 +78,33 @@ public class NoteController {
 
     }
 
+    @GetMapping("/get_notes_byPin")
+    public ResponseEntity getNotesByPin(@RequestHeader(value = "UserToken")String Token){
+        List<NoteDetailsModel> noteDetailsModelList=noteService.getNotesByPin(Token);
+        return  new ResponseEntity
+                (new ResponseDto("THE NOTE BY YOUR Pin IS ","200", noteDetailsModelList),
+                        HttpStatus.OK);
+
+    }
+
+    @GetMapping("/get_notes_bytrash")
+    public ResponseEntity getNotesByTrash(@RequestHeader(value = "UserToken")String Token){
+        List<NoteDetailsModel> noteDetailsModelList=noteService.getNotesByTrash(Token);
+        return  new ResponseEntity
+                (new ResponseDto("THE NOTE BY YOUR TRASH IS ","200", noteDetailsModelList),
+                        HttpStatus.OK);
+
+    }
+
+    @GetMapping("/get_notes_byArchieve")
+    public ResponseEntity getNotesByArchieve(@RequestHeader(value = "UserToken")String Token){
+        List<NoteDetailsModel> noteDetailsModelList=noteService.getNotesByArchieve(Token);
+        return  new ResponseEntity
+                (new ResponseDto("THE NOTE BY YOUR ARCHIEVE IS ","200", noteDetailsModelList),
+                        HttpStatus.OK);
+
+    }
+
     @GetMapping("/get_notes_byFilter")
     public ResponseEntity getNotesByFilter(@RequestHeader(value = "UserToken")String Token,
                                            @RequestParam(name = "pin") boolean pin,
@@ -118,8 +145,82 @@ public class NoteController {
 
         NoteDetailsModel pinNoteDetailsModel=noteService.pinNote(userIdToken,noteId);
         return  new ResponseEntity
-                (new ResponseDto("UPDATED NOTE ","200",pinNoteDetailsModel),
+                (new ResponseDto("UPDATED NOTE PINNED ","200",pinNoteDetailsModel),
                         HttpStatus.OK);
     }
 
-}
+    @PutMapping("/unpin_note")
+    public ResponseEntity unPin(@RequestHeader(name = "userId") String userIdToken,
+                              @RequestParam(name = "noteId") UUID noteId) {
+
+        NoteDetailsModel pinNoteDetailsModel=noteService.UnPinNote(userIdToken,noteId);
+        return  new ResponseEntity
+                (new ResponseDto("UPDATED NOTE UN-PINNED ","200",pinNoteDetailsModel),
+                        HttpStatus.OK);
+    }
+
+    @PutMapping("/archieve_note")
+    public ResponseEntity archieve(@RequestHeader(name = "userId") String userIdToken,
+                              @RequestParam(name = "noteId") UUID noteId) {
+        NoteDetailsModel pinNoteDetailsModel=noteService.archievNote(userIdToken,noteId);
+        return  new ResponseEntity
+                (new ResponseDto("NOTE ARCHIEVED ","200",pinNoteDetailsModel),
+                        HttpStatus.OK);
+
+    }
+
+    @PutMapping("/un-archieve_note")
+    public ResponseEntity UnArchieve(@RequestHeader(name = "userId") String userIdToken,
+                                   @RequestParam(name = "noteId") UUID noteId) {
+        NoteDetailsModel pinNoteDetailsModel=noteService.UnArchievNote(userIdToken,noteId);
+        return  new ResponseEntity
+                (new ResponseDto("NOTE UN_ARCHIEVED ","200",pinNoteDetailsModel),
+                        HttpStatus.OK);
+
+    }
+
+
+    @PutMapping("/archieve_note_pin")
+    public ResponseEntity archieveNoteToPin(@RequestHeader(name = "userId") String userIdToken,
+                                   @RequestParam(name = "noteId") UUID noteId) {
+        NoteDetailsModel pinNoteDetailsModel=noteService.archievNoteToPin(userIdToken,noteId);
+        return  new ResponseEntity
+                (new ResponseDto("NOTE ARCHIEVED TP PIN ","200",pinNoteDetailsModel),
+                        HttpStatus.OK);
+
+    }
+
+    @PutMapping("/trash_note")
+    public ResponseEntity trashNote(@RequestHeader(name = "userId") String userIdToken,
+                                            @RequestParam(name = "noteId") UUID noteId) {
+        NoteDetailsModel pinNoteDetailsModel=noteService.trashNote(userIdToken,noteId);
+        return  new ResponseEntity
+                (new ResponseDto("NOTE IN TRASH ","200",pinNoteDetailsModel),
+                        HttpStatus.OK);
+
+    }
+
+    @PutMapping("/UnTrash_note")
+    public ResponseEntity unTrashNote(@RequestHeader(name = "userId") String userIdToken,
+                                    @RequestParam(name = "noteId") UUID noteId) {
+        NoteDetailsModel pinNoteDetailsModel=noteService.UnTrashNote(userIdToken,noteId);
+        return  new ResponseEntity
+                (new ResponseDto("NOTE UN_TRASHED","200",pinNoteDetailsModel),
+                        HttpStatus.OK);
+
+    }
+
+    @DeleteMapping("/delete_note")
+    public ResponseEntity deleteNote(@RequestHeader(name = "userId") String userIdToken,
+                                    @RequestParam(name = "noteId") UUID noteId) {
+        NoteDetailsModel pinNoteDetailsModel=noteService.deleteNotePerManently(userIdToken,noteId);
+        return  new ResponseEntity
+                (new ResponseDto("NOTE DELETED ","200",null),
+                        HttpStatus.OK);
+
+    }
+
+
+
+
+    }

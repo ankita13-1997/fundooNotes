@@ -99,6 +99,42 @@ public class NoteService implements INoteService {
     }
 
     @Override
+    public List<NoteDetailsModel> getNotesByPin(String token) {
+        UserDetailsModel userDetails = findUser(token);
+        UUID userNumber = userDetails.getUserId();
+        List<NoteDetailsModel> noteDetailsList = noteRepository.findByUserId(userNumber);
+        List<NoteDetailsModel> notelist=noteDetailsList.stream().
+//                filter(noteDetails -> noteDetails.isPin()==true).
+                sorted(Comparator.comparing(NoteDetailsModel::isPin).reversed()).parallel().
+                collect(Collectors.toList());
+        return notelist;
+    }
+
+    @Override
+    public List<NoteDetailsModel> getNotesByTrash(String token) {
+        UserDetailsModel userDetails = findUser(token);
+        UUID userNumber = userDetails.getUserId();
+        List<NoteDetailsModel> noteDetailsList = noteRepository.findByUserId(userNumber);
+        List<NoteDetailsModel> notelist=noteDetailsList.stream().
+               filter(noteDetails -> noteDetails.isTrash()==true).
+          sorted(Comparator.comparing(NoteDetailsModel::getCreatedDate).reversed()).parallel().
+                        collect(Collectors.toList());
+        return notelist;
+    }
+
+    @Override
+    public List<NoteDetailsModel> getNotesByArchieve(String token) {
+        UserDetailsModel userDetails = findUser(token);
+        UUID userNumber = userDetails.getUserId();
+        List<NoteDetailsModel> noteDetailsList = noteRepository.findByUserId(userNumber);
+        List<NoteDetailsModel> notelist=noteDetailsList.stream().
+                filter(noteDetails -> noteDetails.isArchive()==true).
+                sorted(Comparator.comparing(NoteDetailsModel::getCreatedDate).reversed()).parallel().
+                collect(Collectors.toList());
+        return notelist;
+    }
+
+    @Override
     public List<NoteDetailsModel> getNotesByFilter(String token,boolean pin,boolean archive,boolean trash) {
         UserDetailsModel userDetails = findUser(token);
         UUID userNumber = userDetails.getUserId();
@@ -132,9 +168,176 @@ public class NoteService implements INoteService {
     public NoteDetailsModel pinNote(String userIdToken, UUID noteId) {
         UserDetailsModel user = findUser(userIdToken);
         UUID userNumber = user.getUserId();
-        noteRepository
+        NoteDetailsModel findByUserId = noteRepository.
+                findByNoteIdAndUserId(noteId,userNumber).
+                orElseThrow(() -> new NoteException(NoteException.ExceptionType.NOTE_NOT_PRESENT));
+
+       if (findByUserId.isPin()==true){
+           throw new NoteException(NoteException.ExceptionType.NOTE_ALREADY_PINNED);
+       }
+       else {
+           findByUserId.setPin(true);
+           findByUserId.setArchive(false);
+           findByUserId.setTrash(false);
+
+       }
+        NoteDetailsModel save = noteRepository.save(findByUserId);
+        return save;
+    }
+
+    @Override
+    public NoteDetailsModel UnPinNote(String userIdToken, UUID noteId) {
+        UserDetailsModel user = findUser(userIdToken);
+        UUID userNumber = user.getUserId();
+        NoteDetailsModel findByUserId = noteRepository.
+                findByNoteIdAndUserId(noteId,userNumber).
+                orElseThrow(() -> new NoteException(NoteException.ExceptionType.NOTE_NOT_PRESENT));
+
+        if (findByUserId.isPin()==false){
+            throw new NoteException(NoteException.ExceptionType.NOTE_NOT_PINNED);
+        }
+
+        else {
+            findByUserId.setPin(false);
+
+        }
+
+        NoteDetailsModel saveNote = noteRepository.save(findByUserId);
+        return saveNote;
+    }
+
+
+
+    @Override
+    public NoteDetailsModel archievNote(String userIdToken, UUID noteId) {
+        UserDetailsModel user = findUser(userIdToken);
+        UUID userNumber = user.getUserId();
+        NoteDetailsModel findByUserId = noteRepository.
+                findByNoteIdAndUserId(noteId,userNumber).
+                orElseThrow(() -> new NoteException(NoteException.ExceptionType.NOTE_NOT_PRESENT));
+
+        if (findByUserId.isArchive()==true){
+            throw new NoteException(NoteException.ExceptionType.NOTE_ALREADY_ARCHIEVED);
+        }
+
+        else {
+            findByUserId.setPin(false);
+            findByUserId.setArchive(true);
+            findByUserId.setTrash(false);
+        }
+
+        NoteDetailsModel save = noteRepository.save(findByUserId);
+        return save;
+    }
+
+    @Override
+    public NoteDetailsModel archievNoteToPin(String userIdToken, UUID noteId) {
+
+        UserDetailsModel user = findUser(userIdToken);
+        UUID userNumber = user.getUserId();
+        NoteDetailsModel findByUserId = noteRepository.
+                findByNoteIdAndUserId(noteId,userNumber).
+                orElseThrow(() -> new NoteException(NoteException.ExceptionType.NOTE_NOT_PRESENT));
+
+        if (findByUserId.isArchive()==false){
+            throw new NoteException(NoteException.ExceptionType.NOTE_NOT_ARCHIEVED);
+        }
+
+        else{
+            findByUserId.setPin(true);
+            findByUserId.setArchive(false);
+            findByUserId.setTrash(false);
+        }
+        NoteDetailsModel saveNote = noteRepository.save(findByUserId);
+        return saveNote;
+    }
+
+    @Override
+    public NoteDetailsModel trashNote(String userIdToken, UUID noteId) {
+
+
+        UserDetailsModel user = findUser(userIdToken);
+        UUID userNumber = user.getUserId();
+        NoteDetailsModel findByUserId = noteRepository.
+                findByNoteIdAndUserId(noteId,userNumber).
+                orElseThrow(() -> new NoteException(NoteException.ExceptionType.NOTE_NOT_PRESENT));
+
+        if (findByUserId.isTrash()==true){
+            throw new NoteException(NoteException.ExceptionType.NOTE_NOT_ARCHIEVED);
+        }
+
+        else {
+            findByUserId.setPin(false);
+            findByUserId.setArchive(false);
+            findByUserId.setTrash(true);
+        }
+
+        NoteDetailsModel saveNote = noteRepository.save(findByUserId);
+        return saveNote;
+    }
+
+
+
+    @Override
+    public NoteDetailsModel UnArchievNote(String userIdToken, UUID noteId) {
+
+        UserDetailsModel user = findUser(userIdToken);
+        UUID userNumber = user.getUserId();
+        NoteDetailsModel findByUserId = noteRepository.
+                findByNoteIdAndUserId(noteId,userNumber).
+                orElseThrow(() -> new NoteException(NoteException.ExceptionType.NOTE_NOT_PRESENT));
+
+        if (findByUserId.isArchive()==false){
+            throw new NoteException(NoteException.ExceptionType.NOTE_NOT_ARCHIEVED);
+        }
+
+        else {
+            findByUserId.setArchive(false);
+        }
+
+
+        NoteDetailsModel saveNote = noteRepository.save(findByUserId);
+        return saveNote;
+    }
+
+    @Override
+    public NoteDetailsModel UnTrashNote(String userIdToken, UUID noteId) {
+        UserDetailsModel user = findUser(userIdToken);
+        UUID userNumber = user.getUserId();
+        NoteDetailsModel findByUserId = noteRepository.
+                findByNoteIdAndUserId(noteId,userNumber).
+                orElseThrow(() -> new NoteException(NoteException.ExceptionType.NOTE_NOT_PRESENT));
+
+        if (findByUserId.isTrash()==false){
+            throw new NoteException(NoteException.ExceptionType.NOTE_NOT_TRASHED);
+        }
+        else {
+            findByUserId.setTrash(false);
+        }
+        NoteDetailsModel saveNote = noteRepository.save(findByUserId);
+        return saveNote;
+    }
+
+
+
+    @Override
+    public NoteDetailsModel deleteNotePerManently(String userIdToken, UUID noteId) {
+
+        UserDetailsModel user = findUser(userIdToken);
+        UUID userNumber = user.getUserId();
+        NoteDetailsModel findByUserId = noteRepository.
+                findByNoteIdAndUserId(noteId,userNumber).
+                orElseThrow(() -> new NoteException(NoteException.ExceptionType.NOTE_NOT_PRESENT));
+
+        if (!findByUserId.isTrash()){
+            throw new NoteException(NoteException.ExceptionType.NOTE_CANNOT_BE_DELETED);
+        }
+        noteRepository.delete(findByUserId);
+
         return null;
     }
+
+
 
 
     private UserDetailsModel findUser(String token) {

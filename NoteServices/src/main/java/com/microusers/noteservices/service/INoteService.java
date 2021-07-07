@@ -25,6 +25,26 @@ public interface INoteService {
     NoteDetailsModel updateNotes(String token, EditNote editNote);
 
     NoteDetailsModel pinNote(String userIdToken, UUID noteId);
+
+    NoteDetailsModel archievNote(String userIdToken, UUID noteId);
+
+    NoteDetailsModel archievNoteToPin(String userIdToken, UUID noteId);
+
+    NoteDetailsModel trashNote(String userIdToken, UUID noteId);
+
+    NoteDetailsModel deleteNotePerManently(String userIdToken, UUID noteId);
+
+    NoteDetailsModel UnPinNote(String userIdToken, UUID noteId);
+
+    NoteDetailsModel UnArchievNote(String userIdToken, UUID noteId);
+
+    NoteDetailsModel UnTrashNote(String userIdToken, UUID noteId);
+
+    List<NoteDetailsModel> getNotesByPin(String token);
+
+    List<NoteDetailsModel> getNotesByTrash(String token);
+
+    List<NoteDetailsModel> getNotesByArchieve(String token);
 }
 
 
