@@ -1,5 +1,6 @@
 package com.microusers.noteservices.controller;
 
+import com.microusers.noteservices.dto.EditNote;
 import com.microusers.noteservices.dto.NoteDetailsDto;
 import com.microusers.noteservices.dto.ResponseDto;
 import com.microusers.noteservices.model.NoteDetailsModel;
@@ -87,6 +88,38 @@ public class NoteController {
                 (new ResponseDto("THE NOTE BY YOUR FILTER IS ","200", noteDetailsModelList),
                         HttpStatus.OK);
 
+    }
+
+
+
+
+
+   @PutMapping("update_note")
+   public ResponseEntity updateNotes(@RequestHeader(value = "UserToken")String Token,
+                                      @RequestBody EditNote editNote,BindingResult bindingResult){
+
+        if (bindingResult.hasErrors()){
+            return new ResponseEntity<ResponseDto>(new ResponseDto(bindingResult.getAllErrors().get(0).
+                    getDefaultMessage(),"100",null),
+                    HttpStatus.BAD_REQUEST);
+        }
+        NoteDetailsModel noteDetailsModel=noteService.updateNotes(Token,editNote);
+
+
+        return  new ResponseEntity
+                (new ResponseDto("UPDATED NOTE ","200",noteDetailsModel),
+                        HttpStatus.OK);
+
+    }
+
+    @PutMapping("/pin_note")
+    public ResponseEntity pin(@RequestHeader(name = "userId") String userIdToken,
+                                        @RequestParam(name = "noteId") UUID noteId) {
+
+        NoteDetailsModel pinNoteDetailsModel=noteService.pinNote(userIdToken,noteId);
+        return  new ResponseEntity
+                (new ResponseDto("UPDATED NOTE ","200",pinNoteDetailsModel),
+                        HttpStatus.OK);
     }
 
 }

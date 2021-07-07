@@ -1,5 +1,6 @@
 package com.microusers.noteservices.service;
 
+import com.microusers.noteservices.dto.EditNote;
 import com.microusers.noteservices.dto.NoteDetailsDto;
 import com.microusers.noteservices.model.NoteDetailsModel;
 
@@ -20,6 +21,10 @@ public interface INoteService {
     List<NoteDetailsModel> getNotesByTitle(String token);
 
     List<NoteDetailsModel> getNotesByFilter(String token,boolean pin,boolean archieve,boolean trash);
+
+    NoteDetailsModel updateNotes(String token, EditNote editNote);
+
+    NoteDetailsModel pinNote(String userIdToken, UUID noteId);
 }
 
 

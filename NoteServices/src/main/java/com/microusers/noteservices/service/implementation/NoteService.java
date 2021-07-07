@@ -1,5 +1,6 @@
 package com.microusers.noteservices.service.implementation;
 
+import com.microusers.noteservices.dto.EditNote;
 import com.microusers.noteservices.dto.NoteDetailsDto;
 import com.microusers.noteservices.exception.FudooGlobalException;
 import com.microusers.noteservices.exception.NoteException;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -107,6 +109,31 @@ public class NoteService implements INoteService {
                         sorted(Comparator.comparing(NoteDetailsModel::getTitle).reversed()).parallel().
                         collect(Collectors.toList());
         return notelist;
+    }
+
+    @Override
+    public NoteDetailsModel updateNotes(String token, EditNote editNote) {
+        UserDetailsModel userDetailsModel = findUser(token);
+        Optional<NoteDetailsModel> noteById = noteRepository.findById(editNote.getNoteId());
+        if(!noteById.isPresent()){
+            throw new NoteException(NoteException.ExceptionType.NOTE_NOT_PRESENT);
+        }
+        noteById.get().setTitle(editNote.getTitle());
+        noteById.get().setDescription(editNote.getDescription());
+        noteById.get().setColor(editNote.getColor());
+        noteById.get().setUpdatedDate(LocalDateTime.now());
+
+        NoteDetailsModel saveNote = noteRepository.save(noteById.get());
+
+        return saveNote;
+    }
+
+    @Override
+    public NoteDetailsModel pinNote(String userIdToken, UUID noteId) {
+        UserDetailsModel user = findUser(userIdToken);
+        UUID userNumber = user.getUserId();
+        noteRepository
+        return null;
     }
 
 
