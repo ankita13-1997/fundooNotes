@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/notes_api")
 @CrossOrigin
@@ -35,7 +37,14 @@ public class NoteController {
                         HttpStatus.OK);
     }
 
+    @GetMapping("/get_all_notes")
+    public ResponseEntity addNotes(@RequestHeader(value = "UserToken")String Token){
+        List<NoteDetailsModel> noteDetailsModelList = noteService.getListNotes(Token);
 
+        return  new ResponseEntity
+                (new ResponseDto("THE LIST OF NOTES ARE ","200", noteDetailsModelList),
+                        HttpStatus.OK);
+    }
 
 
 

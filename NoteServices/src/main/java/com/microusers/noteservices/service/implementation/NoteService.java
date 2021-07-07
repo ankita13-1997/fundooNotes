@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -44,7 +45,13 @@ public class NoteService implements INoteService {
         return saveNoteDetails;
     }
 
+    @Override
+    public List<NoteDetailsModel> getListNotes(String token) {
+        UserDetailsModel userDetailsModel =findUser(token);
+        List<NoteDetailsModel> noteDetailsList = noteRepository.findAll();
 
+        return noteDetailsList;
+    }
 
 
     private UserDetailsModel findUser(String token) {
