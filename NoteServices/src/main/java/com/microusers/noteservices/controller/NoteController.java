@@ -1,6 +1,7 @@
 package com.microusers.noteservices.controller;
 
 import com.microusers.noteservices.dto.EditNote;
+import com.microusers.noteservices.dto.LabelToNoteDto;
 import com.microusers.noteservices.dto.NoteDetailsDto;
 import com.microusers.noteservices.dto.ResponseDto;
 import com.microusers.noteservices.model.NoteDetailsModel;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +26,7 @@ public class NoteController {
 
     @PostMapping("/add_notes")
     public ResponseEntity addNotes(@RequestHeader(value = "UserToken")String Token,
-                                                     @RequestBody NoteDetailsDto noteDetailsDto, BindingResult bindingResult){
+                                   @RequestBody @Valid NoteDetailsDto noteDetailsDto, BindingResult bindingResult){
 
        if (bindingResult.hasErrors()){
            return new ResponseEntity<ResponseDto>(new ResponseDto(bindingResult.getAllErrors().get(0).
@@ -123,7 +125,7 @@ public class NoteController {
 
    @PutMapping("update_note")
    public ResponseEntity updateNotes(@RequestHeader(value = "UserToken")String Token,
-                                      @RequestBody EditNote editNote,BindingResult bindingResult){
+                                      @RequestBody @Valid EditNote editNote,BindingResult bindingResult){
 
         if (bindingResult.hasErrors()){
             return new ResponseEntity<ResponseDto>(new ResponseDto(bindingResult.getAllErrors().get(0).
@@ -213,12 +215,16 @@ public class NoteController {
     @DeleteMapping("/delete_note")
     public ResponseEntity deleteNote(@RequestHeader(name = "userId") String userIdToken,
                                     @RequestParam(name = "noteId") UUID noteId) {
-        NoteDetailsModel pinNoteDetailsModel=noteService.deleteNotePerManently(userIdToken,noteId);
+        String pinNoteDetailsModel=noteService.deleteNotePerManently(userIdToken,noteId);
         return  new ResponseEntity
-                (new ResponseDto("NOTE DELETED ","200",null),
+                (new ResponseDto("NOTE DELETED ","200",pinNoteDetailsModel),
                         HttpStatus.OK);
 
     }
+
+
+
+
 
 
 

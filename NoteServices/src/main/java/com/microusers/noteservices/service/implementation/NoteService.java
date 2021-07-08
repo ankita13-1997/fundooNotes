@@ -1,9 +1,11 @@
 package com.microusers.noteservices.service.implementation;
 
 import com.microusers.noteservices.dto.EditNote;
+import com.microusers.noteservices.dto.LabelToNoteDto;
 import com.microusers.noteservices.dto.NoteDetailsDto;
 import com.microusers.noteservices.exception.FudooGlobalException;
 import com.microusers.noteservices.exception.NoteException;
+import com.microusers.noteservices.model.LabelDetailsModel;
 import com.microusers.noteservices.model.NoteDetailsModel;
 import com.microusers.noteservices.model.UserDetailsModel;
 import com.microusers.noteservices.repository.INoteRepository;
@@ -133,6 +135,9 @@ public class NoteService implements INoteService {
                 collect(Collectors.toList());
         return notelist;
     }
+
+
+
 
     @Override
     public List<NoteDetailsModel> getNotesByFilter(String token,boolean pin,boolean archive,boolean trash) {
@@ -321,7 +326,7 @@ public class NoteService implements INoteService {
 
 
     @Override
-    public NoteDetailsModel deleteNotePerManently(String userIdToken, UUID noteId) {
+    public String deleteNotePerManently(String userIdToken, UUID noteId) {
 
         UserDetailsModel user = findUser(userIdToken);
         UUID userNumber = user.getUserId();
@@ -334,7 +339,7 @@ public class NoteService implements INoteService {
         }
         noteRepository.delete(findByUserId);
 
-        return null;
+        return "THE NOTE DETAILS DELETED SUCCESSFULLY";
     }
 
 
@@ -345,6 +350,7 @@ public class NoteService implements INoteService {
         UserDetailsModel userDetailsModel = restTemplate.
                 getForObject("http://localhost:8081/user/getuser?userEmailToken= "+token,
                         UserDetailsModel.class);
+
 
         if(userDetailsModel == null){
             throw new NoteException(NoteException.ExceptionType.USER_NOT_PRESENT);

@@ -1,6 +1,7 @@
 package com.microusers.noteservices.service;
 
 import com.microusers.noteservices.dto.EditNote;
+import com.microusers.noteservices.dto.LabelToNoteDto;
 import com.microusers.noteservices.dto.NoteDetailsDto;
 import com.microusers.noteservices.model.NoteDetailsModel;
 
@@ -32,7 +33,7 @@ public interface INoteService {
 
     NoteDetailsModel trashNote(String userIdToken, UUID noteId);
 
-    NoteDetailsModel deleteNotePerManently(String userIdToken, UUID noteId);
+    String deleteNotePerManently(String userIdToken, UUID noteId);
 
     NoteDetailsModel UnPinNote(String userIdToken, UUID noteId);
 
@@ -45,6 +46,9 @@ public interface INoteService {
     List<NoteDetailsModel> getNotesByTrash(String token);
 
     List<NoteDetailsModel> getNotesByArchieve(String token);
+
+
+
 }
 
 

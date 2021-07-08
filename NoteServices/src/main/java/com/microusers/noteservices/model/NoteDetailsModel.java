@@ -1,5 +1,6 @@
 package com.microusers.noteservices.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -68,6 +70,15 @@ public class NoteDetailsModel {
 
     @Column(name = "user_email")
     private String userEmail;
+
+    @JsonIgnoreProperties(value = "notes")
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<LabelDetailsModel> labels;
+
+
+    @JsonIgnoreProperties(value = "notes")
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<CollaboratorDetailsModel> collaborators;
 
     public NoteDetailsModel(String title, String color, Date reminder, String description) {
         this.title=title;
