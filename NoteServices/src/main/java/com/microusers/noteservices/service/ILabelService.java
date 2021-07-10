@@ -18,4 +18,11 @@ public interface ILabelService {
     String deleteLabelDetails(String userIdToken, UUID labelId);
 
     NoteDetailsModel addLabelNote(String token, UUID labelId, UUID noteId);
+
+
+    NoteDetailsModel addNewLabelToExistingNote(String token, UUID noteId,LabelDto addLabelDto);
+
+    List<LabelDetailsModel> getLabelByNotes(String userIdToken, UUID noteId);
+
+    String deleteLabelFromNote(String token, UUID labelId, UUID noteId);
 }

@@ -15,9 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class LabelService implements ILabelService {
@@ -103,6 +105,87 @@ public class LabelService implements ILabelService {
         NoteDetailsModel saveNote = noteRepository.save(searchNote);
 
         return saveNote;
+    }
+
+    @Override
+    public NoteDetailsModel addNewLabelToExistingNote(String token,
+                                                      UUID noteId,LabelDto addLabelDto) {
+
+        UserDetailsModel user = findUser(token);
+        NoteDetailsModel noteSearch = noteRepository.
+                findByNoteIdAndUserId(noteId, user.getUserId())
+                .orElseThrow(() -> new NoteException(NoteException.ExceptionType.NOTE_NOT_PRESENT));
+
+        if(noteSearch.getLabels().contains(addLabelDto.getLabelName()))
+        {
+          throw new LabelException(LabelException.ExceptionType.LABEL_ALREADY_PRESENT_FOR_NOTE);
+        }
+
+        Optional<LabelDetailsModel> labelSearch = labelRepository.
+                findByLabelNameAndUserId(addLabelDto.getLabelName(), user.getUserId());
+        if (labelSearch.isPresent()){
+            throw new LabelException(LabelException.ExceptionType.LABEL_ALREADY_PRESENT);
+        }
+
+
+        LabelDetailsModel labelDetailsModel = new LabelDetailsModel(addLabelDto.getLabelName());
+        labelDetailsModel.setUserId(user.getUserId());
+
+        LabelDetailsModel saveLabel = labelRepository.save(labelDetailsModel);
+        //saveLabel.getNotes().add(noteSearch);
+        labelRepository.save(saveLabel);
+        noteSearch.getLabels().add(saveLabel);
+
+        NoteDetailsModel saveNote = noteRepository.save(noteSearch);
+        saveNote.getLabels().add(saveLabel);
+        NoteDetailsModel saveNoteWithLabel = noteRepository.save(saveNote);
+
+        return saveNoteWithLabel;
+    }
+
+    @Override
+    public List<LabelDetailsModel> getLabelByNotes(String userIdToken, UUID noteId) {
+
+        UserDetailsModel user = findUser(userIdToken);
+        NoteDetailsModel searchNote = noteRepository.
+                findByNoteIdAndUserId(noteId, user.getUserId()).
+                orElseThrow(() -> new NoteException(NoteException.ExceptionType.NOTE_NOT_PRESENT));
+        List<NoteDetailsModel> noteDetailsModelList = new ArrayList<>();
+        noteDetailsModelList.add(searchNote);
+        List<LabelDetailsModel> labelDetailsModelList=labelRepository.findByUserId(user.getUserId());
+
+        List<LabelDetailsModel> collectLabelList = labelDetailsModelList.stream().
+                filter(labelDetailsModel -> labelDetailsModel.getNotes().equals(noteDetailsModelList)).
+                collect(Collectors.toList());
+
+
+        return collectLabelList;
+    }
+
+    @Override
+    public String deleteLabelFromNote(String token,UUID labelId, UUID noteId) {
+        UserDetailsModel user = findUser(token);
+
+        NoteDetailsModel searchNote = noteRepository.
+                findByNoteIdAndUserId(noteId, user.getUserId())
+                .orElseThrow(() -> new NoteException(NoteException.ExceptionType.NOTE_NOT_PRESENT));
+
+        LabelDetailsModel labelSearch = labelRepository.
+                findByUserIdAndLabelId(user.getUserId(), labelId).
+                orElseThrow(() -> new LabelException(LabelException.ExceptionType.LABEL_NOT_PRESENT));
+
+        if (searchNote.getLabels().contains(labelSearch)==false && user==null){
+            throw new LabelException(LabelException.ExceptionType.LABEL_NOT_PRESENT);
+
+
+        }
+
+        labelSearch.getNotes().remove(searchNote);
+        searchNote.getLabels().remove(labelSearch);
+        labelRepository.save(labelSearch);
+        noteRepository.save(searchNote);
+
+        return "DELETED THE LABEL FROM NOTE";
     }
 
 

@@ -14,4 +14,5 @@ public interface  INoteRepository extends JpaRepository<NoteDetailsModel, UUID> 
           List<NoteDetailsModel> findByUserId(UUID userId);
           Optional<NoteDetailsModel> findByNoteIdAndUserId(UUID noteId,UUID userId);
 
+
 }

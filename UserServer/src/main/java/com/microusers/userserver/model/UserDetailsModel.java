@@ -37,7 +37,7 @@ public class UserDetailsModel {
     public boolean isVerified;
     public LocalDateTime createdAt = LocalDateTime.now();
     public LocalDateTime updatedAt;
-
+    private boolean isActive;
 
 
     public UserDetailsModel(String fullName, String phoneNumber, String emailID, String password) {

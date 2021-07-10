@@ -83,7 +83,7 @@ public class LabelController {
     }
 
 
-    @GetMapping("/labels")
+    @PostMapping("/labels_to_note")
     public ResponseEntity addLabeltoNote(@RequestHeader String token,
                                          @RequestParam UUID labelId,
                                          @RequestParam UUID noteId) {
@@ -96,6 +96,56 @@ public class LabelController {
                         HttpStatus.OK);
 
     }
+    @PutMapping("/labels_to_note_new")
+    public ResponseEntity addNewLabeltoNote(@RequestHeader String token,
+                                            @RequestParam UUID noteId,
+                                            @RequestBody @Valid LabelDto addLabelDto,
+                                            BindingResult bindingResult){
+
+        if (bindingResult.hasErrors()) {
+            return new ResponseEntity<ResponseDto>(new ResponseDto(bindingResult.getAllErrors().get(0).
+                    getDefaultMessage(), "100", null),
+                    HttpStatus.BAD_REQUEST);
+        }
+
+        NoteDetailsModel noteDetailsModel=labelService.addNewLabelToExistingNote(token,noteId,addLabelDto);
+
+        return new ResponseEntity
+                (new ResponseDto("THE LABEL ADDED TO NOTE SUCCESSFULLY ",
+                        "200",
+                        noteDetailsModel),
+                        HttpStatus.OK);
+
+    }
+
+
+    @GetMapping("/getting_all_label_notes")
+    public ResponseEntity getLabelOfNotes(@RequestHeader(name = "userId") String userIdToken,
+                                          @RequestParam UUID noteId) {
+
+        List<LabelDetailsModel> labelList=labelService.getLabelByNotes(userIdToken,noteId);
+
+
+
+        return new ResponseEntity
+                (new ResponseDto("THE LABEL LIST ARE ", "200", labelList),
+                        HttpStatus.OK);
+
+    }
+
+    @PutMapping("/label/remove_label_from_Note")
+    public ResponseEntity removeLabeltoNote(@RequestHeader String token,
+                                            @RequestParam UUID labelId,
+                                            @RequestParam UUID noteId){
+
+        String deleteMessage=labelService.deleteLabelFromNote(token,labelId,noteId);
+
+        return new ResponseEntity
+                (new ResponseDto("THE LABEL DELETION STATUS ", "200", deleteMessage),
+                        HttpStatus.OK);
+
+    }
+
 }
 
 
