@@ -17,13 +17,22 @@ public class FudooGlobalException {
     @ExceptionHandler(NoteException.class)
     public ResponseEntity<ResponseDto> userExceptionHandler(NoteException noteException) {
         log.error("Exception Occurred : " +noteException.exceptionType.errorMsg);
-        return new ResponseEntity<ResponseDto>(new ResponseDto(noteException.exceptionType.errorMsg, null,null), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<ResponseDto>(new ResponseDto(noteException.exceptionType.errorMsg,
+                null,null), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(LabelException.class)
     public ResponseEntity<ResponseDto> NoteResponseHandler(LabelException labelException) {
         log.error("Exception Occurred : " +labelException.exceptionType.errorMsg);
-        return new ResponseEntity<ResponseDto>(new ResponseDto(labelException.exceptionType.errorMsg, null,null), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<ResponseDto>(new ResponseDto(labelException.exceptionType.errorMsg,
+                null,null), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CollabaretorException.class)
+    public ResponseEntity<ResponseDto> CollabaretorResponseHandler(CollabaretorException collabException) {
+        log.error("Exception Occurred : " +collabException.exceptionType.errorMsg);
+        return new ResponseEntity<ResponseDto>(new ResponseDto(collabException.exceptionType.errorMsg,
+                null,null), HttpStatus.BAD_REQUEST);
     }
 
 }

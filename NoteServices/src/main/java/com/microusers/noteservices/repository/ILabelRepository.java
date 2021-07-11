@@ -18,4 +18,5 @@ public interface ILabelRepository extends JpaRepository<LabelDetailsModel, UUID>
     Optional<LabelDetailsModel> findByLabelNameAndUserId(String labelName,UUID userId);
 
 
+
 }

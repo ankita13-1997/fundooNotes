@@ -152,14 +152,9 @@ public class LabelService implements ILabelService {
                 orElseThrow(() -> new NoteException(NoteException.ExceptionType.NOTE_NOT_PRESENT));
         List<NoteDetailsModel> noteDetailsModelList = new ArrayList<>();
         noteDetailsModelList.add(searchNote);
-        List<LabelDetailsModel> labelDetailsModelList=labelRepository.findByUserId(user.getUserId());
+        List<LabelDetailsModel> listLabel = searchNote.getLabels();
 
-        List<LabelDetailsModel> collectLabelList = labelDetailsModelList.stream().
-                filter(labelDetailsModel -> labelDetailsModel.getNotes().equals(noteDetailsModelList)).
-                collect(Collectors.toList());
-
-
-        return collectLabelList;
+        return listLabel;
     }
 
     @Override

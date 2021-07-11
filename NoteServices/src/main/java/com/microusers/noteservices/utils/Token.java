@@ -3,6 +3,7 @@ package com.microusers.noteservices.utils;
 
 
 
+import com.microusers.noteservices.model.CollaboratorDetailsModel;
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Service;
 
@@ -13,32 +14,32 @@ import java.util.UUID;
 public class Token {
 
 
-//        public String generateLoginToken(UserDetailsModel userDetails) {
-//
-//            long currentTime = System.currentTimeMillis();
-//
-//            return Jwts.builder()
-//                    .setId(String.valueOf(userDetails.userId))
-//                    .setSubject(userDetails.fullName)
-//                    .setIssuedAt(new Date())
-//                    .setExpiration(new Date(currentTime + 100000000))
-//                    .signWith(SignatureAlgorithm.HS256, "sd5745FAHFW")
-//                    .compact();
-//        }
-//
-//
-//        public String generateVerificationToken(UserDetailsModel userDetails) {
-//
-//            long currentTime = System.currentTimeMillis();
-//            System.out.println("generate token id:   " + userDetails.userId);
-//            return Jwts.builder()
-//                    .setId(String.valueOf(userDetails.userId))
-//                    .setSubject(userDetails.fullName)
-//                    .setIssuedAt(new Date())
-//                    .setExpiration(new Date(currentTime +100000000))
-//                    .signWith(SignatureAlgorithm.HS256, "sd5745FAHFW")
-//                    .compact();
-//        }
+        public String generateLoginToken(CollaboratorDetailsModel collabDetails) {
+
+            long currentTime = System.currentTimeMillis();
+
+            return Jwts.builder()
+                    .setId(String.valueOf(collabDetails.getCollaboratorId()))
+                    .setSubject(collabDetails.getUserFullName())
+                    .setIssuedAt(new Date())
+                    .setExpiration(new Date(currentTime + 100000000))
+                    .signWith(SignatureAlgorithm.HS256, "sd5745FAHFW")
+                    .compact();
+        }
+
+
+        public String generateVerificationToken(CollaboratorDetailsModel collaboratorDetails) {
+
+            long currentTime = System.currentTimeMillis();
+            System.out.println("generate token id:   " + collaboratorDetails.getCollaboratorId());
+            return Jwts.builder()
+                    .setId(String.valueOf(collaboratorDetails.CollaboratorId))
+                    .setSubject(collaboratorDetails.getUserFullName())
+                    .setIssuedAt(new Date())
+                    .setExpiration(new Date(currentTime +100000000))
+                    .signWith(SignatureAlgorithm.HS256, "sd5745FAHFW")
+                    .compact();
+        }
 
         public UUID decodeJWT(String jwt) throws JwtException {
             try {

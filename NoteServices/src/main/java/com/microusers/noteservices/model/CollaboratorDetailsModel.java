@@ -28,6 +28,12 @@ public class CollaboratorDetailsModel {
     @Type(type = "uuid-char")
     public UUID CollaboratorId;
 
+    @Column(name = "Collaborator_email")
+    private String collabEmail;
+
+    @Column(name = "Collaborator_Addec")
+    private boolean isAdded;
+
     @Column(name = "Collaborator_created_date")
     private LocalDateTime createdDate= LocalDateTime.now();
 
@@ -53,5 +59,7 @@ public class CollaboratorDetailsModel {
     private List<NoteDetailsModel> notes;
 
 
-
+    public CollaboratorDetailsModel(String collabEmail) {
+        this.collabEmail=collabEmail;
+    }
 }

@@ -11,7 +11,7 @@ public class ResponseDto {
 
     public String message;
     private String statusCode;
-    private Object fullname;
+//    private Object fullname;
     private Object object;
 
     public ResponseDto(String message, String statusCode, Object object) {
@@ -30,10 +30,10 @@ public class ResponseDto {
     }
 
 
-    public ResponseDto(String message, String statusCode, Object object, Object fullname) {
-        this.message=message;
-        this.statusCode=statusCode;
-        this.object=object;
-        this.fullname=fullname;
-    }
+//    public ResponseDto(String message, String statusCode, Object object, Object fullname) {
+//        this.message=message;
+//        this.statusCode=statusCode;
+//        this.object=object;
+//        this.fullname=fullname;
+//    }
 }
