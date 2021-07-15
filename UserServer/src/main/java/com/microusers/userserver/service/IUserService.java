@@ -23,4 +23,6 @@ public interface IUserService {
     List<UserDetailsModel> getUserInformation(String token);
 
     UserDetailsModel setUserDetails(String token);
+
+    UserDetailsModel getUser(String token);
 }

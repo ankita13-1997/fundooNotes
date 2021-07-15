@@ -243,7 +243,7 @@ public class CollabaretorService implements ICollabaretorService {
                 orElseThrow(() -> new CollabaretorException
                         (CollabaretorException.ExceptionType.COLLABARETOR_NOT_PRESENT));
 
-        if (noteSearch.getLabels().contains(collabSearch)) {
+        if (noteSearch.getLabels().equals(collabSearch)) {
             throw new CollabaretorException(CollabaretorException.ExceptionType.
                     COLLABARETOR_NOT_PRESENT_FOR_NOTE);
         }
@@ -262,7 +262,7 @@ public class CollabaretorService implements ICollabaretorService {
     private UserDetailsModel findUser(String token) {
 
         UserDetailsModel userDetailsModel = restTemplate.
-                getForObject("http://localhost:8081/user/getuser?userEmailToken= "+token,
+                getForObject("http://localhost:8081/user/getUserRedish?token="+token,
                         UserDetailsModel.class);
 
 
@@ -271,5 +271,5 @@ public class CollabaretorService implements ICollabaretorService {
         }
 
         return userDetailsModel;
-    }
+    }  
 }

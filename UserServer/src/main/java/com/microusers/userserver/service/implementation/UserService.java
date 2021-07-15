@@ -1,14 +1,18 @@
 package com.microusers.userserver.service.implementation;
 
+import com.microusers.userserver.dto.ReddishDto;
 import com.microusers.userserver.dto.userLoginDto;
 import com.microusers.userserver.dto.userRegistrationDto;
 import com.microusers.userserver.exception.FudooGlobalException;
 import com.microusers.userserver.exception.UserException;
+//import com.microusers.userserver.model.RabbitMQBody;
 import com.microusers.userserver.model.UserDetailsModel;
 import com.microusers.userserver.repository.UserRepository;
 import com.microusers.userserver.service.IUserService;
 import com.microusers.userserver.utils.MailService;
 import com.microusers.userserver.utils.Token;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -36,6 +40,11 @@ public class UserService implements IUserService {
     @Autowired
     MailService mailService;
 
+    @Autowired
+    RedisService redisService;
+
+//    @Autowired
+//    private RabbitTemplate rabbitTemplate;
 
 
 
@@ -59,6 +68,13 @@ public class UserService implements IUserService {
         } catch (MessagingException e) {
             e.printStackTrace();
         }
+//
+//        RabbitMQBody rabbitMQBody = new RabbitMQBody();
+//        rabbitMQBody.setEmail(userDetails.getEmailID());
+//        rabbitMQBody.setSubject("the verification link for registration");
+//        rabbitMQBody.setBody(requestUrl);
+//        rabbitTemplate.convertAndSend("user_serviceKey", rabbitMQBody);
+
 
 
         return saveDetails;
@@ -97,6 +113,8 @@ public class UserService implements IUserService {
                 throw new UserException(UserException.ExceptionType.PASSWORD_INVALID);
             }
             String tokenString = jwtToken.generateLoginToken(userDetailsByEmail.get());
+            ReddishDto reddishDto= new ReddishDto(userDetailsByEmail.get().getUserId(),tokenString);
+            redisService.saveData(reddishDto);
             System.out.println("the user model  "+userDetailsByEmail.get());
             return userDetailsByEmail.get();
         }
@@ -145,5 +163,14 @@ public class UserService implements IUserService {
 
 
         return findTheExistedUser;
+    }
+
+    @Override
+    public UserDetailsModel getUser(String token) {
+        String user = redisService.getData(token);
+
+        Optional<UserDetailsModel> userSearch = userDetailsRepository.findById(UUID.fromString(user));
+        System.out.println(userSearch);
+        return userSearch.get();
     }
 }

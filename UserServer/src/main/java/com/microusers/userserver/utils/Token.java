@@ -40,6 +40,7 @@ public class Token {
                     .compact();
         }
 
+
         public UUID decodeJWT(String jwt) throws JwtException {
             try {
                 Claims claims = Jwts.parser()

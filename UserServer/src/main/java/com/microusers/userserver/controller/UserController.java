@@ -129,5 +129,13 @@ public class UserController {
 
     }
 
+    @GetMapping("/getUserRedish")
+    public UserDetailsModel getUseForRedish(@RequestParam(name = "token") String token){
+        System.out.println("token "+token);
+        UserDetailsModel user = userService.getUser(token);
+
+        return user;
+    }
+
 
 }

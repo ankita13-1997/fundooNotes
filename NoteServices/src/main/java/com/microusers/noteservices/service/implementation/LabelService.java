@@ -187,7 +187,7 @@ public class LabelService implements ILabelService {
     private UserDetailsModel findUser(String token) {
 
         UserDetailsModel userDetailsModel = restTemplate.
-                getForObject("http://localhost:8081/user/getuser?userEmailToken= "+token,
+                getForObject("http://localhost:8081/user/getUserRedish?token="+token,
                         UserDetailsModel.class);
 
 
@@ -196,6 +196,6 @@ public class LabelService implements ILabelService {
         }
 
         return userDetailsModel;
-}
+    }
 
     }
