@@ -271,5 +271,5 @@ public class CollabaretorService implements ICollabaretorService {
         }
 
         return userDetailsModel;
-    }  
+    }
 }

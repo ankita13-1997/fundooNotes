@@ -6,10 +6,11 @@ import com.microusers.userserver.dto.userRegistrationDto;
 import com.microusers.userserver.exception.FudooGlobalException;
 import com.microusers.userserver.exception.UserException;
 //import com.microusers.userserver.model.RabbitMQBody;
+import com.microusers.userserver.model.RabbitMQBody;
 import com.microusers.userserver.model.UserDetailsModel;
 import com.microusers.userserver.repository.UserRepository;
 import com.microusers.userserver.service.IUserService;
-import com.microusers.userserver.utils.MailService;
+//import com.microusers.userserver.utils.MailService;
 import com.microusers.userserver.utils.Token;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -37,14 +38,14 @@ public class UserService implements IUserService {
     @Autowired
     Token jwtToken ;
 
-    @Autowired
-    MailService mailService;
+//    @Autowired
+//    MailService mailService;
 
     @Autowired
     RedisService redisService;
 
-//    @Autowired
-//    private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
 
 
@@ -63,17 +64,17 @@ public class UserService implements IUserService {
         String tokenId = jwtToken.generateVerificationToken(userDetailsModel);
         String requestUrl ="http://localhost:8081/user/verify/email/"+tokenId;
         System.out.println("token from registration is "+tokenId);
-        try {
-            mailService.sendMail(requestUrl,"the verification link is ",userDetailsModel.getEmailID());
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
-//
-//        RabbitMQBody rabbitMQBody = new RabbitMQBody();
-//        rabbitMQBody.setEmail(userDetails.getEmailID());
-//        rabbitMQBody.setSubject("the verification link for registration");
-//        rabbitMQBody.setBody(requestUrl);
-//        rabbitTemplate.convertAndSend("user_serviceKey", rabbitMQBody);
+//        try {
+//            mailService.sendMail(requestUrl,"the verification link is ",userDetailsModel.getEmailID());
+//        } catch (MessagingException e) {
+//            e.printStackTrace();
+//        }
+
+        RabbitMQBody rabbitMQBody = new RabbitMQBody();
+        rabbitMQBody.setEmail(userDetails.getEmailID());
+        rabbitMQBody.setSubject("the verification link for registration");
+        rabbitMQBody.setBody(requestUrl);
+        rabbitTemplate.convertAndSend("user_service", rabbitMQBody);
 
 
 
@@ -127,7 +128,7 @@ public class UserService implements IUserService {
         String tokenGenerate = jwtToken.generateVerificationToken(user);
         String urlToken = "Click on below link to Reset your Password \n"
                 + "http://localhost:8081/user/reset/password/" +tokenGenerate;
-        mailService.sendMail(urlToken, "Reset Password", user.emailID);
+//        mailService.sendMail(urlToken, "Reset Password", user.emailID);
         return "Reset Password Link Has Been Sent To Your Email Address";
     }
 
