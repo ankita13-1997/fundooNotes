@@ -128,7 +128,12 @@ public class UserService implements IUserService {
         String tokenGenerate = jwtToken.generateVerificationToken(user);
         String urlToken = "Click on below link to Reset your Password \n"
                 + "http://localhost:8081/user/reset/password/" +tokenGenerate;
-//        mailService.sendMail(urlToken, "Reset Password", user.emailID);
+
+        RabbitMQBody rabbitMQBody = new RabbitMQBody();
+        rabbitMQBody.setEmail(user.getEmailID());
+        rabbitMQBody.setSubject("the reset link ");
+        rabbitMQBody.setBody(urlToken);
+        rabbitTemplate.convertAndSend("user_service", rabbitMQBody);
         return "Reset Password Link Has Been Sent To Your Email Address";
     }
 

@@ -2,15 +2,13 @@ package com.microusers.noteservices.service.implementation;
 
 import com.microusers.noteservices.exception.CollabaretorException;
 import com.microusers.noteservices.exception.NoteException;
-import com.microusers.noteservices.model.CollaboratorDetailsModel;
-import com.microusers.noteservices.model.LabelDetailsModel;
-import com.microusers.noteservices.model.NoteDetailsModel;
-import com.microusers.noteservices.model.UserDetailsModel;
+import com.microusers.noteservices.model.*;
 import com.microusers.noteservices.repository.ICollabaratorRepository;
 import com.microusers.noteservices.repository.INoteRepository;
 import com.microusers.noteservices.service.ICollabaretorService;
-import com.microusers.noteservices.utils.MailService;
+//import com.microusers.noteservices.utils.MailService;
 import com.microusers.noteservices.utils.Token;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -34,11 +32,14 @@ public class CollabaretorService implements ICollabaretorService {
     @Autowired
     Token jwtToken;
 
-    @Autowired
-    MailService mailService;
+//    @Autowired
+//    MailService mailService;
 
     @Autowired
     INoteRepository noteRepository;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
 
     @Override
@@ -61,11 +62,13 @@ public class CollabaretorService implements ICollabaretorService {
         String tokenId = jwtToken.generateVerificationToken(collaboratorDetailsModel);
         String requestUrl ="http://localhost:8082/collabaretor/verify/email_collab/"+tokenId;
         System.out.println("token from registration is "+tokenId);
-        try {
-            mailService.sendMail(requestUrl,"the verification link is ",collaboratorDetailsModel.getCollabEmail());
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
+
+
+        RabbitMQBody rabbitMQBody = new RabbitMQBody();
+        rabbitMQBody.setEmail(collabEmail);
+        rabbitMQBody.setSubject("the collabarattion link ");
+        rabbitMQBody.setBody(requestUrl);
+        rabbitTemplate.convertAndSend("user_service", rabbitMQBody);
 
 
         return saveCollab;
@@ -121,11 +124,17 @@ public class CollabaretorService implements ICollabaretorService {
 
         String message = "the deletion message";
         System.out.println("token from registration is "+tokenId);
-        try {
-            mailService.sendMail(message,"You are removed collab by ",collabByCollabEmailAAndUserId.get().getCollabEmail());
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            mailService.sendMail(message,"You are removed collab by ",collabByCollabEmailAAndUserId.get().getCollabEmail());
+//        } catch (MessagingException e) {
+//            e.printStackTrace();
+//        }
+
+        RabbitMQBody rabbitMQBody = new RabbitMQBody();
+        rabbitMQBody.setEmail(email);
+        rabbitMQBody.setSubject("You are removed collab by ");
+        rabbitMQBody.setBody(collabByCollabEmailAAndUserId.get().getCollabEmail());
+        rabbitTemplate.convertAndSend("user_service", rabbitMQBody);
         return   collabByCollabEmailAAndUserId.get().getCollabEmail()+"DELETED FROM COLLAB";
     }
 
@@ -197,11 +206,15 @@ public class CollabaretorService implements ICollabaretorService {
         String requestUrl ="http://localhost:8082/collabaretor/verify/email_collab/"+tokenId;
         System.out.println("token from registration is "+tokenId);
 
-        try {
-            mailService.sendMail(requestUrl,"the verification link is ",saveCollab.getCollabEmail());
-        } catch (MessagingException e) {
-            e.printStackTrace();
-        }
+
+
+        RabbitMQBody rabbitMQBody = new RabbitMQBody();
+        rabbitMQBody.setEmail(collabEmail);
+        rabbitMQBody.setSubject("the collabarattion removal link");
+        rabbitMQBody.setBody(requestUrl);
+        rabbitTemplate.convertAndSend("user_service", rabbitMQBody);
+
+
           noteSearch.getCollaborators().add(saveCollab);
           NoteDetailsModel noteSave=noteRepository.save(noteSearch);
 
