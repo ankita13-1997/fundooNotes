@@ -3,6 +3,7 @@ package com.microusers.noteservices.service.implementation;
 import com.microusers.noteservices.dto.EditNote;
 import com.microusers.noteservices.dto.LabelToNoteDto;
 import com.microusers.noteservices.dto.NoteDetailsDto;
+import com.microusers.noteservices.elasticsearch.IElasticSearch;
 import com.microusers.noteservices.exception.FudooGlobalException;
 import com.microusers.noteservices.exception.NoteException;
 import com.microusers.noteservices.model.LabelDetailsModel;
@@ -10,6 +11,8 @@ import com.microusers.noteservices.model.NoteDetailsModel;
 import com.microusers.noteservices.model.UserDetailsModel;
 import com.microusers.noteservices.repository.INoteRepository;
 import com.microusers.noteservices.service.INoteService;
+import org.elasticsearch.action.search.SearchRequest;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -30,6 +33,12 @@ public class NoteService implements INoteService {
     @Autowired
     INoteRepository noteRepository;
 
+    @Autowired
+    ModelMapper modelMapper;
+
+    @Autowired
+    IElasticSearch elastic;
+
     @Override
     public NoteDetailsModel addNewNotes(String token, NoteDetailsDto noteDetailsDto) {
         UserDetailsModel userDetailsModel =findUser(token);
@@ -46,7 +55,7 @@ public class NoteService implements INoteService {
         noteDetailsModel.setUserId(userDetailsModel.getUserId());
         noteDetailsModel.setUserEmail(userDetailsModel.getEmailID());
         noteDetailsModel.setUserFullName(userDetailsModel.getFullName());
-
+        elastic.addNewNotes(noteDetailsModel);
         NoteDetailsModel saveNoteDetails = noteRepository.save(noteDetailsModel);
 
         return saveNoteDetails;
@@ -60,6 +69,7 @@ public class NoteService implements INoteService {
 //        List<NoteDetailsModel> noteDetailsList = noteRepository.findAll().stream().
 //                    filter(note -> note.getUserId()==userNumber).
 //                     collect(Collectors.toList());
+
         List<NoteDetailsModel> noteDetailsList = noteRepository.findByUserId(userNumber);
         System.out.println(noteDetailsList);
         return noteDetailsList;
@@ -159,11 +169,13 @@ public class NoteService implements INoteService {
         if(!noteById.isPresent()){
             throw new NoteException(NoteException.ExceptionType.NOTE_NOT_PRESENT);
         }
+
         noteById.get().setTitle(editNote.getTitle());
         noteById.get().setDescription(editNote.getDescription());
         noteById.get().setColor(editNote.getColor());
         noteById.get().setUpdatedDate(LocalDateTime.now());
 
+        elastic.updateNote(noteById.get());
         NoteDetailsModel saveNote = noteRepository.save(noteById.get());
 
         return saveNote;
@@ -186,6 +198,8 @@ public class NoteService implements INoteService {
            findByUserId.setTrash(false);
 
        }
+
+        elastic.updateNote(findByUserId);
         NoteDetailsModel save = noteRepository.save(findByUserId);
         return save;
     }
@@ -207,6 +221,7 @@ public class NoteService implements INoteService {
 
         }
 
+        elastic.updateNote(findByUserId);
         NoteDetailsModel saveNote = noteRepository.save(findByUserId);
         return saveNote;
     }
@@ -231,6 +246,7 @@ public class NoteService implements INoteService {
             findByUserId.setTrash(false);
         }
 
+        elastic.updateNote(findByUserId);
         NoteDetailsModel save = noteRepository.save(findByUserId);
         return save;
     }
@@ -253,6 +269,8 @@ public class NoteService implements INoteService {
             findByUserId.setArchive(false);
             findByUserId.setTrash(false);
         }
+
+        elastic.updateNote(findByUserId);
         NoteDetailsModel saveNote = noteRepository.save(findByUserId);
         return saveNote;
     }
@@ -277,6 +295,7 @@ public class NoteService implements INoteService {
             findByUserId.setTrash(true);
         }
 
+        elastic.updateNote(findByUserId);
         NoteDetailsModel saveNote = noteRepository.save(findByUserId);
         return saveNote;
     }
@@ -300,7 +319,7 @@ public class NoteService implements INoteService {
             findByUserId.setArchive(false);
         }
 
-
+        elastic.updateNote(findByUserId);
         NoteDetailsModel saveNote = noteRepository.save(findByUserId);
         return saveNote;
     }
@@ -319,6 +338,7 @@ public class NoteService implements INoteService {
         else {
             findByUserId.setTrash(false);
         }
+        elastic.updateNote(findByUserId);
         NoteDetailsModel saveNote = noteRepository.save(findByUserId);
         return saveNote;
     }
@@ -337,14 +357,13 @@ public class NoteService implements INoteService {
         if (!findByUserId.isTrash()){
             throw new NoteException(NoteException.ExceptionType.NOTE_CANNOT_BE_DELETED);
         }
+        elastic.deleteNote(userNumber);
         noteRepository.delete(findByUserId);
 
         return "THE NOTE DETAILS DELETED SUCCESSFULLY";
     }
 
-
-
-
+    
     private UserDetailsModel findUser(String token) {
 
         UserDetailsModel userDetailsModel = restTemplate.
@@ -358,4 +377,6 @@ public class NoteService implements INoteService {
 
         return userDetailsModel;
     }
+
+
 }
