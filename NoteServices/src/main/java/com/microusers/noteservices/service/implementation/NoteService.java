@@ -55,9 +55,8 @@ public class NoteService implements INoteService {
         noteDetailsModel.setUserId(userDetailsModel.getUserId());
         noteDetailsModel.setUserEmail(userDetailsModel.getEmailID());
         noteDetailsModel.setUserFullName(userDetailsModel.getFullName());
-        elastic.addNewNotes(noteDetailsModel);
         NoteDetailsModel saveNoteDetails = noteRepository.save(noteDetailsModel);
-
+        elastic.addNewNotes(saveNoteDetails);
         return saveNoteDetails;
     }
 
@@ -363,7 +362,7 @@ public class NoteService implements INoteService {
         return "THE NOTE DETAILS DELETED SUCCESSFULLY";
     }
 
-    
+
     private UserDetailsModel findUser(String token) {
 
         UserDetailsModel userDetailsModel = restTemplate.

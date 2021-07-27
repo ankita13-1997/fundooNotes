@@ -44,7 +44,7 @@ public class ElasticSearch implements IElasticSearch{
 
     @Override
     public NoteDetailsModel addNewNotes(NoteDetailsModel noteDetailsModel) {
-        @SuppressWarnings("unchecked")
+
         Map<String, Object> dataMap = objectMapper.convertValue(noteDetailsModel, Map.class);
         String uuid = noteDetailsModel.getNoteId().toString();
         System.out.println("UUID TO STRING :"+uuid);

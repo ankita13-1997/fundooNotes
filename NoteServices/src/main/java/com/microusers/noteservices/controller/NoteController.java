@@ -4,6 +4,7 @@ import com.microusers.noteservices.dto.EditNote;
 import com.microusers.noteservices.dto.LabelToNoteDto;
 import com.microusers.noteservices.dto.NoteDetailsDto;
 import com.microusers.noteservices.dto.ResponseDto;
+import com.microusers.noteservices.elasticsearch.IElasticSearch;
 import com.microusers.noteservices.model.NoteDetailsModel;
 import com.microusers.noteservices.service.INoteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,6 +25,9 @@ public class NoteController {
 
     @Autowired
     INoteService noteService;
+
+    @Autowired
+    IElasticSearch elasticSearch;
 
     @PostMapping("/add_notes")
     public ResponseEntity addNotes(@RequestHeader(value = "UserToken")String Token,
@@ -222,7 +227,17 @@ public class NoteController {
 
     }
 
+    @GetMapping("elasticSearch/getallNotes")
+    public List<NoteDetailsModel> findAll() throws Exception{
+        return elasticSearch.searchData();
+    }
 
+    @GetMapping("elasticSearch/getnotesbytitle")
+    public List<NoteDetailsModel>findByTitle(@RequestParam String query,@RequestHeader String token) throws IllegalArgumentException, UnsupportedEncodingException {
+        List<NoteDetailsModel> noteDetailsModelList=elasticSearch.searchall(query, token);
+        return noteDetailsModelList;
+
+    }
 
 
 
